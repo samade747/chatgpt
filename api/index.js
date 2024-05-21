@@ -1,18 +1,23 @@
-import OpenAI from "openai";
+// import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generativeai";
+import dotenv from "dotenv";
 
 
 const app = express();
 // const openai = new OpenAI();
-const genAI = new GoogleGenerativeAI(apiKey);
+const genAI = new GoogleGenerativeAI(process.env.apiKey);
+
+
+const PORT = process.env.PORT || 3000
+
+dotenv.config();
+
+
 
 app.use(cors());
 app.use(express.json());
-
-
-
 
 
 app.post("/", async (req, res) => { 
@@ -20,37 +25,37 @@ app.post("/", async (req, res) => {
      });
 
 
+app.get("/chatgpt", async (req, res) => {
 
-
-app.get("/chatgpt", (req, res) => {
+    const userInput = req.body.input
         console.log(req.body.input)
 
-    async function main() {
+    if(!userInput) {
+      return res.status(400).send('No Input Provided');
+    }
+    
+    try{
         const model = genAI.getGenerativeModel({ 
             model: "gemini-pro",
             prompt : req.body.input
 
         });
-    
-    
-    console.log(req.body.input)
-    console.log(image.data)
-    // res.send(image.data)
+        
 
-    const prompt = req.body.input;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text()
-    res.send(text)
+        const result = await model.generateContent(userInput);
+        const response = await result.response;
+        const text = response.text()
+        res.send(text)
+    } catch{
+        res.send(500).send('Error Generating Content')
     }
-    main()
+    
 });
 
 
 
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log("Server is running on port 3000") 
 })
 
