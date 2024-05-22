@@ -1,13 +1,13 @@
 // import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
-import { GoogleGenerativeAI } from "@google/generativeai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 
 
 const app = express();
 // const openai = new OpenAI();
-const genAI = new GoogleGenerativeAI(process.env.apiKey);
+const genAI = new GoogleGenerativeAI(process.env.api_Key);
 
 
 const PORT = process.env.PORT || 3000
@@ -25,7 +25,7 @@ app.post("/", async (req, res) => {
      });
 
 
-app.get("/chatgpt", async (req, res) => {
+app.post("/chatgpt", async (req, res) => {
 
     const userInput = req.body.input
         console.log(req.body.input)
@@ -40,17 +40,27 @@ app.get("/chatgpt", async (req, res) => {
             prompt : req.body.input
 
         });
-        
-
         const result = await model.generateContent(userInput);
-        const response = await result.response;
-        const text = response.text()
-        res.send(text)
-    } catch{
-        res.send(500).send('Error Generating Content')
+        const text = result.text;
+
+        res.json({ response: text });
+    } catch (error) {
+        console.error('Error generating content:', error);
+        if (!res.headersSent) {
+            res.status(500).send('Error Generating Content');
+        }
     }
-    
 });
+
+//         const result = await model.generateContent(userInput);
+//         const response = await result.response;
+//         const text = response.text()
+//         res.send(text)
+//     } catch{
+//         res.send(500).send('Error Generating Content')
+//     }
+    
+// });
 
 
 
