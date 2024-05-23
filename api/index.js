@@ -1,47 +1,50 @@
-// import OpenAI from "openai";
-import express from "express";
-import cors from "cors";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-
-const app = express();
-// const openai = new OpenAI();
-const genAI = new GoogleGenerativeAI(process.env.api_Key);
-
-
-const PORT = process.env.PORT || 3000
-
+// Load environment variables
 dotenv.config();
 
+const app = express();
+const apiKey = process.env.API_KEY;
 
+if (!apiKey) {
+    console.error('API_KEY is not defined in the environment variables');
+    process.exit(1);
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
+
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+app.post('/', (req, res) => {
+    res.send('Hello World');
+});
 
-app.post("/", async (req, res) => { 
-    res.send('Hello World')
-     });
+app.post('/chatgpt', async (req, res) => {
+    const userInput = req.body.input;
 
-
-app.post("/chatgpt", async (req, res) => {
-
-    const userInput = req.body.input
-        console.log(req.body.input)
-
-    if(!userInput) {
-      return res.status(400).send('No Input Provided');
+    if (!userInput) {
+        return res.status(400).send('No Input Provided');
     }
-    
-    try{
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro",
-            prompt : req.body.input
 
-        });
+    try {
+        console.log('Generating content for input:', userInput);
+
+        // Initialize the model
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
+        // Generate content
         const result = await model.generateContent(userInput);
-        const text = result.text;
+
+        // Extract the generated text from the first candidate
+        const text = result.response.candidates[0].content;
+
+        console.log('Generated text:', text);
 
         res.json({ response: text });
     } catch (error) {
@@ -52,40 +55,7 @@ app.post("/chatgpt", async (req, res) => {
     }
 });
 
-//         const result = await model.generateContent(userInput);
-//         const response = await result.response;
-//         const text = response.text()
-//         res.send(text)
-//     } catch{
-//         res.send(500).send('Error Generating Content')
-//     }
-    
-// });
-
-
-
-
 app.listen(PORT, () => {
-    console.log("Server is running on port 3000") 
-})
-
-
-
-    // // const completion = await openai.chat.completions.create({
-    // //     messages: [{ 
-    // //     role: "system",
-    // //     content: "You are a helpful assistant." }],
-    // //     model: "gpt-3.5-turbo",
-    // //   });
-
-    // const prompt = req.body.input;
-
-    // const result = await 
-
-
-
-
-
-
-
+    console.log(`Server is running on port ${PORT}`);
+});
 
