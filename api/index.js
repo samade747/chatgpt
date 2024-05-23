@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -35,13 +34,15 @@ app.post('/chatgpt', async (req, res) => {
     try {
         console.log('Generating content for input:', userInput);
 
-        // Initialize the model
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        
+        const model = genAI.getGenerativeModel({ 
+            model: 'gemini-pro'
+        });
 
-        // Generate content
+        
         const result = await model.generateContent(userInput);
 
-        // Extract the generated text from the first candidate
+        
         const text = result.response.candidates[0].content;
 
         console.log('Generated text:', text);
