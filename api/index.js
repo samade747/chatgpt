@@ -28,12 +28,15 @@ app.post('/chatgpt', async (req, res) => {
         return res.status(400).send('No Input');
     }
     try {
-        console.log('input:', userInput);        
-        const model = genAI.getGenerativeModel({ 
+        console.log('input:', userInput);
+        const model = genAI.getGenerativeModel({
             model: 'gemini-pro'
-        });        
-        const result = await model.generateContent(userInput);        
-        const text = result.response.candidates[0].content;
+        });
+        const result = await model.generateContent(userInput);
+        console.log('Generated result:', JSON.stringify(result, null, 2)); // Log the entire result
+
+        // Correctly extract the text from the response
+        const text = result.response?.candidates?.[0]?.content?.parts?.map(part => part.text).join(' ') || 'No content generated';
         console.log('Generated text:', text);
         res.json({ response: text });
     } catch (error) {
@@ -47,4 +50,3 @@ app.post('/chatgpt', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
