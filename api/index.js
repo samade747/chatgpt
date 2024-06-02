@@ -18,11 +18,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.post('/', (req, res) => {
+app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.post('/chatgpt', async (req, res) => {
+app.get('/chatgpt', async (req, res) => {
     const userInput = req.body.input;
     if (!userInput) {
         return res.status(400).send('No Input');
